@@ -1,6 +1,6 @@
-#include <core.hpp>
+#include "rtcore.hpp"
 #include "sphere.hpp"
-#include <hittable.hpp>
+#include "hittable.hpp"
 
 
 color ray_color(const ray& r, const Hittable& world) {

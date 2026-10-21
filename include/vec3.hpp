@@ -12,7 +12,7 @@
 // <http://creativecommons.org/publicdomain/zero/1.0/>.
 //==============================================================================================
 
-#include <core.hpp>
+#include "core.hpp"
 
 class vec3 {
 public:

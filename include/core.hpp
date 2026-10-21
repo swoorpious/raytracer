@@ -11,10 +11,7 @@
 #include <memory>
 #include <vector>
 
-
-#include <vec3.hpp>
-#include <ray.hpp>
-#include <color.hpp>
+#include "vec3.hpp"
 
 
 const double infinity = std::numeric_limits<double>::infinity();

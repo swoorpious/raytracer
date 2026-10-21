@@ -12,7 +12,7 @@
 // <http://creativecommons.org/publicdomain/zero/1.0/>.
 //==============================================================================================
 
-#include "vec3.hpp"
+#include <vec3.hpp>
 
 class ray {
 public:

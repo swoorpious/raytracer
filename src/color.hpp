@@ -1,7 +1,7 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-#include <core.hpp>
+#include <../include/core.hpp>
 
 
 using color = vec3;

@@ -3,7 +3,7 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
-#include "core.hpp"
+#include "rtcore.hpp"
 
 struct HitRecord {
     point3 p;
