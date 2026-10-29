@@ -3,6 +3,7 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
+#include <core.hpp>
 #include "rtcore.hpp"
 
 struct HitRecord {
@@ -21,7 +22,7 @@ struct HitRecord {
 class Hittable {
 public:
     ~Hittable() = default;
-    virtual bool hits(const ray& r, double t_min, double t_max, HitRecord& rec) const = 0;
+    virtual bool hits(const ray& r, IntervalF tBounds, HitRecord& rec) const = 0;
 };
 
 
@@ -35,13 +36,13 @@ public:
     void clear() { objects.clear(); }
     void add(std::shared_ptr<Hittable> object) { objects.push_back(object); }
     
-    virtual bool hits(const ray& r, double t_min, double t_max, HitRecord& rec) const override {
+    virtual bool hits(const ray& r, IntervalF tBounds, HitRecord& rec) const override {
         HitRecord temp;
         bool hitAnyAtAll = false;
-        double closestSoFar = t_max;
+        double closestSoFar = tBounds.max;
         
         for(const auto& object : objects) {
-            if(object->hits(r, t_min, closestSoFar, temp)) {
+            if(object->hits(r, { tBounds.min, closestSoFar}, temp)) {
                 hitAnyAtAll = true;
                 closestSoFar = temp.t;
                 rec = temp;

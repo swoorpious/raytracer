@@ -2,28 +2,36 @@
 
 #ifndef INTERVAL_HPP
 #define INTERVAL_HPP
+#include <limits>
 
-#include <core.hpp>
+const double infinity = std::numeric_limits<double>::infinity();
 
 struct IntervalF {
     double min, max;
 
-    double size() { return max - min; }
+    double size() const { return max - min; }
 
-    bool contains(double x) {
+    bool contains(double x) const {
         return min <= x && x <= max;
     }
 
-    bool surrounds(double x) {
+    bool surrounds(double x) const {
         return min < x && x < max;
+    }
+
+    // uses the min, max variables defined above
+    double clamp(double x) const {
+        if (x <= min) return min;
+        if (x >= max) return max;
+        return x;
     }
 
     IntervalF() : min(infinity), max(-infinity) {}
     IntervalF(double min, double max) : min(min), max(max) {}
 
-    static Zero() { return {0, 0}; }
-    static Empty() { return {infinity, -infinity}; }
-    static Universe() { return {-infinity, infinity}; }
+    static IntervalF Zero() { return {0, 0}; }
+    static IntervalF Empty() { return {infinity, -infinity}; }
+    static IntervalF Universe() { return {-infinity, infinity}; }
 };
 
 

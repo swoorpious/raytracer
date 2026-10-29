@@ -12,7 +12,7 @@ public:
     Sphere(const point3& center, double radius) :
         center(center), radius(radius) {}
 
-    virtual bool hits(const ray& r, double t_min, double t_max, HitRecord& rec) const override;
+    virtual bool hits(const ray& r, IntervalF tBounds, HitRecord& rec) const override;
 
 private:
     point3 center;

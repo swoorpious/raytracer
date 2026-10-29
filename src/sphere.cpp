@@ -1,7 +1,7 @@
 // copyright 2026 swaroop.
 #include "sphere.hpp"
 
-bool Sphere::hits(const ray& r, double t_min, double t_max, HitRecord& rec) const {
+bool Sphere::hits(const ray& r, IntervalF tBounds, HitRecord& rec) const {
     vec3 oc = center - r.getOrigin();
     double a = r.getDirection().length_squared();
     double h = dot(r.getDirection(), oc);
@@ -14,9 +14,9 @@ bool Sphere::hits(const ray& r, double t_min, double t_max, HitRecord& rec) cons
     double sqrtd = std::sqrt(discriminant);
 
     double root = (h - sqrtd) / a;
-    if (root <= t_min || t_max <= root) {
+    if (root <= tBounds.min || tBounds.max <= root) {
         root = (h + sqrtd) / a;
-        if (root <= t_min || t_max <= root)
+        if (root <= tBounds.min || tBounds.max <= root)
             return false;
     }
 
