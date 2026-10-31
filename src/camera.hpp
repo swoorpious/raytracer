@@ -14,17 +14,20 @@ public:
 
     float aspect_ratio = 16.0/9.0;
     int samples_per_pixel = 10;
+    int ray_bounce_depth = 5;
     
     void render();
-    void updateSampleCount(int samples);
+    void setSampleCount(int samples);
+    void setImageWidth(int width);
+    void setRayDepth(int depth);
     
 private:
-    color rayColor(const ray& r);
+    color rayColor(const ray& r, int depth);
     ray getRay(int i, int j);
     
-    inline vec3 sampleSquare()const;
+    inline vec3 sampleSquare() const;
 
-    int image_width;
+    int image_width = 400;
     int image_height;
     
     float focal_length;
