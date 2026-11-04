@@ -14,12 +14,14 @@ public:
 
     float aspect_ratio = 16.0/9.0;
     int samples_per_pixel = 10;
-    int ray_bounce_depth = 5;
+    int ray_bounce_depth = 50;
     
     void render();
     void setSampleCount(int samples);
     void setImageWidth(int width);
     void setRayDepth(int depth);
+    void setOutStream(std::ofstream& strm);
+    void setMaxRayBounces(int bounces);
     
 private:
     color rayColor(const ray& r, int depth);
@@ -45,7 +47,8 @@ private:
     vec3 pixel00_loc;
 
     HittableList& world;
-
+    std::ofstream* outStrm = nullptr;
+    
 };
 
 

@@ -13,7 +13,11 @@ Camera::Camera(HittableList& world) : world(world)
 }
 
 void Camera::render() {
-    std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+    *outStrm << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+    std::clog << "image width: " << image_width <<
+        "\nimage height: " << image_height <<
+        "\nmax ray bounces: " << ray_bounce_depth <<
+        "\nsamples per pixel: " << samples_per_pixel << '\n\n';
 
     for (int j = 0; j < image_height; j++) {
         std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
@@ -24,7 +28,7 @@ void Camera::render() {
                 ray t = getRay(i, j);
                 pixel_color += rayColor(t, ray_bounce_depth);
             }
-            writeColor(std::cout, pixel_samples_scale * pixel_color);
+            writeColor(*outStrm, pixel_samples_scale * pixel_color);
         }
     }
 
@@ -56,6 +60,14 @@ void Camera::setImageWidth(int width) {
 
 void Camera::setRayDepth(int depth) {
     ray_bounce_depth = depth;
+}
+
+void Camera::setOutStream(std::ofstream& strm) {
+    outStrm = &strm;
+}
+
+void Camera::setMaxRayBounces(int bounces) {
+    ray_bounce_depth = bounces;
 }
 
 // cpu shader stuff

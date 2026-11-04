@@ -2,9 +2,10 @@
 #define COLOR_H
 
 #include <core.hpp>
+#include <fstream>
 
 
-inline void writeColor(std::ostream& out, const color& pixelColor) {
+inline void writeColor(std::ofstream& out, const color& pixelColor) {
     auto r = pixelColor.x();
     auto g = pixelColor.y();
     auto b = pixelColor.z();
