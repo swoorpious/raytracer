@@ -17,7 +17,7 @@ void Camera::render() {
     std::clog << "image width: " << image_width <<
         "\nimage height: " << image_height <<
         "\nmax ray bounces: " << ray_bounce_depth <<
-        "\nsamples per pixel: " << samples_per_pixel << '\n\n';
+        "\nsamples per pixel: " << samples_per_pixel << "\n\n";
 
     for (int j = 0; j < image_height; j++) {
         std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
@@ -77,13 +77,13 @@ color Camera::rayColor(const ray& r, int depth) {
 
     HitRecord rec;
     if (world.hits(r, {0.001, infinity}, rec)) {
-        vec3 direction = random_on_hemisphere(rec.normal); // random new ray bounce direction
-        return 0.5 * rayColor(ray(rec.p, direction), depth - 1); // new ray bounce
+        vec3 direction = rec.normal + random_unit_vector(); // random new ray bounce direction
+        return 0.7 * rayColor(ray(rec.p, direction), depth - 1); // new ray bounce
     }
 
     vec3 unit_direction = unit_vector(r.getDirection());
-    float a = 0.5 * (unit_direction.y() + 1.0);
-    return (1.f-a) * color(1.0f,1.f,1.f) + a * color(0.5f,0.7f,0.8f);
+    double a = 0.5 * (unit_direction.y() + 1.0);
+    return (1.f-a) * color(1.0f,1.f,1.f) + a * color(0.5f,0.7f,1.f);
 }
 
 ray Camera::getRay(int i, int j) {

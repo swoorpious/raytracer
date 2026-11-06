@@ -21,7 +21,7 @@ struct HitRecord {
 
 class Hittable {
 public:
-    ~Hittable() = default;
+    virtual ~Hittable() = default;
     virtual bool hits(const ray& r, IntervalF tBounds, HitRecord& rec) const = 0;
 };
 
