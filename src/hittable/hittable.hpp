@@ -5,18 +5,7 @@
 
 #include <core.hpp>
 #include "rtcore.hpp"
-
-struct HitRecord {
-    point3 p;
-    vec3 normal;
-    double t;
-    bool isFrontFace;
-    
-    void setOutwardNormal(const ray& r, const vec3 outNormal) {
-        isFrontFace = dot(r.getDirection(), outNormal) < 0;
-        normal = isFrontFace ? outNormal : -outNormal;
-    }
-};
+#include "hit_record.hpp"
 
 
 class Hittable {

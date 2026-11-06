@@ -1,11 +1,12 @@
 // copyright 2026 swaroop.
 
 #include "camera.hpp"
+
+#include "material.hpp"
 #include "ray.hpp"
 
 
-Camera::Camera(HittableList& world) : world(world)
-{
+Camera::Camera(HittableList& world) : world(world) {
     focal_length = 1.0;
     camera_center = point3(0, 0, 0);
     setImageWidth(image_width);
@@ -45,17 +46,16 @@ void Camera::setImageWidth(int width) {
     image_height = int(image_width / aspect_ratio);
     image_height = (image_height < 1) ? 1 : image_height;
     viewport_height = 2.0;
-    viewport_width = viewport_height * (double(image_width)/image_height);
-        viewport_u = vec3(viewport_width, 0, 0);
+    viewport_width = viewport_height * (double(image_width) / image_height);
+    viewport_u = vec3(viewport_width, 0, 0);
     viewport_v = vec3(0, -viewport_height, 0);
 
     pixel_delta_u = viewport_u / image_width;
     pixel_delta_v = viewport_v / image_height;
 
     viewport_upper_left = camera_center
-                             - vec3(0, 0, focal_length) - viewport_u/2 - viewport_v/2;
+        - vec3(0, 0, focal_length) - viewport_u / 2 - viewport_v / 2;
     pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
-
 }
 
 void Camera::setRayDepth(int depth) {
@@ -73,17 +73,22 @@ void Camera::setMaxRayBounces(int bounces) {
 // cpu shader stuff
 color Camera::rayColor(const ray& r, int depth) {
     // if we've exceeded the ray bounce limit, no more light is gathered.
-    if (depth <= 0) return color(0,0,0);
+    if (depth <= 0) return color(0, 0, 0);
 
     HitRecord rec;
     if (world.hits(r, {0.001, infinity}, rec)) {
-        vec3 direction = rec.normal + random_unit_vector(); // random new ray bounce direction
-        return 0.7 * rayColor(ray(rec.p, direction), depth - 1); // new ray bounce
+        ray scattered;
+        color attenuation;
+
+        if (rec.mat->scatter(r, rec, attenuation, scattered))
+            return attenuation * rayColor(scattered, depth - 1); // new ray bounce
+
+        return color(0, 0, 0);
     }
 
     vec3 unit_direction = unit_vector(r.getDirection());
     double a = 0.5 * (unit_direction.y() + 1.0);
-    return (1.f-a) * color(1.0f,1.f,1.f) + a * color(0.5f,0.7f,1.f);
+    return (1.f - a) * color(1.0f, 1.f, 1.f) + a * color(0.5f, 0.7f, 1.f);
 }
 
 ray Camera::getRay(int i, int j) {

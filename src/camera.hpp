@@ -3,7 +3,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 #include <core.hpp>
-#include "hittable.hpp"
+#include "hittable/hittable.hpp"
 
 
 class ray;

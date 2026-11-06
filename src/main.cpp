@@ -1,9 +1,10 @@
 #include "rtcore.hpp"
-#include "sphere.hpp"
-#include "hittable.hpp"
+#include "hittable/sphere.hpp"
+#include "hittable/hittable.hpp"
 #include "camera.hpp"
 #include <filesystem>
 #include <getopt.h>
+
 
 void postRender(std::string& filename, std::shared_ptr<std::string> path);
 
@@ -18,9 +19,16 @@ int main(const int argc, char* argv[]) {
 
     std::filesystem::create_directories(OUTPUT_PATH);
 
+    std::shared_ptr<Material> material_ground = std::make_shared<Lambertian>(color(0.8, 0.8, 0.0));
+    std::shared_ptr<Material> material_center = std::make_shared<Lambertian>(color(0.1, 0.2, 0.5));
+    std::shared_ptr<Material> material_left =   std::make_shared<Metal>(color(0.8, 0.8, 0.8));
+    std::shared_ptr<Material> material_right =  std::make_shared<Metal>(color(0.8, 0.6, 0.2));
+
     HittableList world;
-    world.add(std::make_shared<Sphere>(point3(0, 0, -1), 0.5));
-    world.add(std::make_shared<Sphere>(point3(0, -100.5, -1), 100));
+    world.add(std::make_shared<Sphere>(point3(   0,      0,   -1),   0.5, material_center));
+    world.add(std::make_shared<Sphere>(point3(   0, -100.5,   -1),   100, material_ground));
+    world.add(std::make_shared<Sphere>(point3(-1.0,    0.0, -1.0),   0.5, material_left));
+    world.add(std::make_shared<Sphere>(point3( 1.0,    0.0, -1.0),   0.5, material_right));
     Camera cam(world);
 
     // parse args
