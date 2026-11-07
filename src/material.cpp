@@ -31,7 +31,7 @@ bool Glass::scatter(
     double ri = rec.isFrontFace ? 1.f / refractiveIndex : refractiveIndex;
 
     vec3 unitDirection = unit_vector(r_in.getDirection());
-    double cos = std::fmin(dot(unitDirection, rec.normal), 1.0);
+    double cos = std::fmin(dot(-unitDirection, rec.normal), 1.0);
     double sin = std::sqrt(1.f - cos * cos);
     vec3 direction;
     if (ri * sin > 1.f || reflectance(cos, ri) > randomDouble())

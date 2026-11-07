@@ -18,18 +18,52 @@ int main(const int argc, char* argv[]) {
         };
 
     std::filesystem::create_directories(OUTPUT_PATH);
-
-    std::shared_ptr<Material> material_ground = std::make_shared<Lambertian>(color(0.8, 0.8, 0.0));
-    std::shared_ptr<Material> material_center = std::make_shared<Lambertian>(color(0.1, 0.2, 0.5));
-    std::shared_ptr<Material> material_left = std::make_shared<Glass>(1.0 / 1.2);
-    std::shared_ptr<Material> material_right = std::make_shared<Metal>(color(0.8, 0.6, 0.2), 0.f);
+    const auto startTime = std::chrono::high_resolution_clock::now();
 
     HittableList world;
-    world.add(std::make_shared<Sphere>(point3(0, -100.5, -1), 100, material_ground));
-    world.add(std::make_shared<Sphere>(point3(0, 0, -1.5), 0.5, material_center));
-    world.add(std::make_shared<Sphere>(point3(-1.0, 0.0, -1.0), 0.5, material_left));
-    world.add(std::make_shared<Sphere>(point3(1.0, 0.0, -1.0), 0.5, material_right));
     Camera cam(world);
+
+    auto ground_material = std::make_shared<Lambertian>(color(0.5, 0.5, 0.5));
+    world.add(std::make_shared<Sphere>(point3(0, -1000, 0), 1000, ground_material));
+
+    for (int a = -11; a < 11; a++) {
+        for (int b = -11; b < 11; b++) {
+            auto choose_mat = randomDouble();
+            point3 center(a + 0.9 * randomDouble(), 0.2, b + 0.9 * randomDouble());
+
+            if ((center - point3(4, 0.2, 0)).length() > 0.9) {
+                std::shared_ptr<Material> sphere_material;
+
+                if (choose_mat < 0.8) {
+                    // diffuse
+                    auto albedo = color::random() * color::random();
+                    sphere_material = std::make_shared<Lambertian>(albedo);
+                    world.add(std::make_shared<Sphere>(center, 0.2, sphere_material));
+                }
+                else if (choose_mat < 0.95) {
+                    // metal
+                    auto albedo = color::random(0.5, 1);
+                    auto fuzz = randomDouble(0, 0.5);
+                    sphere_material = std::make_shared<Metal>(albedo, fuzz);
+                    world.add(std::make_shared<Sphere>(center, 0.2, sphere_material));
+                }
+                else {
+                    // glass
+                    sphere_material = std::make_shared<Glass>(1.5);
+                    world.add(std::make_shared<Sphere>(center, 0.2, sphere_material));
+                }
+            }
+        }
+    }
+
+    auto material1 = std::make_shared<Glass>(1.5);
+    world.add(std::make_shared<Sphere>(point3(0, 1, 0), 1.0, material1));
+
+    auto material2 = std::make_shared<Lambertian>(color(0.4, 0.2, 0.1));
+    world.add(std::make_shared<Sphere>(point3(-4, 1, 0), 1.0, material2));
+
+    auto material3 = std::make_shared<Metal>(color(0.7, 0.6, 0.5), 0.0);
+    world.add(std::make_shared<Sphere>(point3(4, 1, 0), 1.0, material3));
 
     // parse args
     std::string filename = "image"; // file will be image.ppm
@@ -65,15 +99,33 @@ int main(const int argc, char* argv[]) {
     cam.setOutStream(file);
 
     // position cam
-    cam.lookfrom = point3(-2, 2, 1);
-    cam.lookat = point3(0, 0, -1);
+    cam.vfov = 20;
+    cam.lookfrom = point3(13, 2, 3);
+    cam.lookat = point3(0, 0, 0);
     cam.vup = vec3(0, 1, 0);
+
+    cam.defocus_angle = 0.6;
+    cam.focus_dist = 10.0;
 
     cam.render();
 
     file.close();
 
     postRender(filename, path);
+    const auto endTime = std::chrono::high_resolution_clock::now();
+    auto totalSeconds = std::chrono::duration_cast<std::chrono::seconds>(
+        endTime - startTime
+    ).count();
+
+    auto hours = totalSeconds / 3600;
+    auto minutes = (totalSeconds % 3600) / 60;
+    auto seconds = totalSeconds % 60;
+
+    std::clog << "\n\ntotal execution time: "
+        << hours << "h "
+        << minutes << "m "
+        << seconds << "s\n"
+        << std::endl;
 
     return 0;
 }
