@@ -19,4 +19,4 @@ if [[ ! -f "$INPUT" ]]; then
 fi
 
 magick "$INPUT" "$OUTPUT"
-rm -f "$INPUT"
+#rm -f "$INPUT"

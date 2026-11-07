@@ -14,6 +14,7 @@
 #include <cstring>
 #include <string>
 #include <fstream>
+#include <chrono>
 
 #include "vec3.hpp"
 #include "interval.hpp"

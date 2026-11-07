@@ -20,3 +20,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Release>:OUTPUT_PATH="./output/">
         $<$<CONFIG:Release>:PROJECT_DIR="./">
 )
+
+if (MINGW)
+    target_link_options(${PROJECT_NAME} PRIVATE -static -static-libgcc -static-libstdc++)
+endif ()
