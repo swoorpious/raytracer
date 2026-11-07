@@ -15,27 +15,36 @@ public:
     float aspect_ratio = 16.0/9.0;
     int samples_per_pixel = 10;
     int ray_bounce_depth = 50;
-    
+
+    double vfov = 90.0;                  // vertical field of view, in degrees
+    point3 lookfrom = point3(0, 0, 0);
+    point3 lookat   = point3(0, 0, -1);
+    vec3   vup      = vec3(0, 1, 0);     // camera-relative "up" direction
+
     void render();
     void setSampleCount(int samples);
     void setImageWidth(int width);
     void setRayDepth(int depth);
     void setOutStream(std::ofstream& strm);
     void setMaxRayBounces(int bounces);
-    
+
 private:
+    void initialize();
     color rayColor(const ray& r, int depth);
     ray getRay(int i, int j);
-    
+
     inline vec3 sampleSquare() const;
 
     int image_width = 400;
     int image_height;
-    
-    float focal_length;
-    float viewport_width;
-    float viewport_height;
+
+    double focal_length;
+    double viewport_width;
+    double viewport_height;
     point3 camera_center;
+
+    // camera frame basis vectors
+    vec3 u, v, w;
 
     vec3 viewport_u;
     vec3 viewport_v;
@@ -48,7 +57,7 @@ private:
 
     HittableList& world;
     std::ofstream* outStrm = nullptr;
-    
+
 };
 
 

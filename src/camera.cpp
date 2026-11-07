@@ -6,14 +6,44 @@
 #include "ray.hpp"
 
 
-Camera::Camera(HittableList& world) : world(world) {
-    focal_length = 1.0;
-    camera_center = point3(0, 0, 0);
-    setImageWidth(image_width);
-    setSampleCount(samples_per_pixel);
+Camera::Camera(HittableList& world) : world(world) {}
+
+void Camera::initialize() {
+    image_height = int(image_width / aspect_ratio);
+    image_height = (image_height < 1) ? 1 : image_height;
+
+    pixel_samples_scale = 1.0 / samples_per_pixel;
+
+    camera_center = lookfrom;
+
+    // viewport dimensions. vfov is the full vertical angle, so the half-angle is used.
+    focal_length = (lookfrom - lookat).length();
+    double theta = degreesToRadians(vfov);
+    double h = std::tan(theta / 2);
+    viewport_height = 2 * h * focal_length;
+    viewport_width = viewport_height * (double(image_width) / image_height);
+
+    // orthonormal basis for the camera frame: u = right, v = up, w = backward (camera looks along -w)
+    w = unit_vector(lookfrom - lookat);
+    u = unit_vector(cross(vup, w));
+    v = cross(w, u);
+
+    // vectors across the horizontal and down the vertical viewport edges
+    viewport_u = viewport_width * u;
+    viewport_v = viewport_height * -v;
+
+    // pixel to pixel delta vectors
+    pixel_delta_u = viewport_u / image_width;
+    pixel_delta_v = viewport_v / image_height;
+
+    // location of the upper left pixel
+    viewport_upper_left = camera_center - (focal_length * w) - viewport_u / 2 - viewport_v / 2;
+    pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 }
 
 void Camera::render() {
+    initialize();
+
     *outStrm << "P3\n" << image_width << ' ' << image_height << "\n255\n";
     std::clog << "image width: " << image_width <<
         "\nimage height: " << image_height <<
@@ -36,26 +66,14 @@ void Camera::render() {
     std::clog << "\rDone.                 \n";
 }
 
+// these setters only store values now; initialize() (called from render) derives the rest,
+// so nothing can go stale regardless of the order you set things in.
 void Camera::setSampleCount(int samples) {
     samples_per_pixel = samples;
-    pixel_samples_scale = 1.f / samples;
 }
 
 void Camera::setImageWidth(int width) {
     image_width = width;
-    image_height = int(image_width / aspect_ratio);
-    image_height = (image_height < 1) ? 1 : image_height;
-    viewport_height = 2.0;
-    viewport_width = viewport_height * (double(image_width) / image_height);
-    viewport_u = vec3(viewport_width, 0, 0);
-    viewport_v = vec3(0, -viewport_height, 0);
-
-    pixel_delta_u = viewport_u / image_width;
-    pixel_delta_v = viewport_v / image_height;
-
-    viewport_upper_left = camera_center
-        - vec3(0, 0, focal_length) - viewport_u / 2 - viewport_v / 2;
-    pixel00_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 }
 
 void Camera::setRayDepth(int depth) {
@@ -69,6 +87,7 @@ void Camera::setOutStream(std::ofstream& strm) {
 void Camera::setMaxRayBounces(int bounces) {
     ray_bounce_depth = bounces;
 }
+
 
 // cpu shader stuff
 color Camera::rayColor(const ray& r, int depth) {

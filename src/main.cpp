@@ -21,14 +21,14 @@ int main(const int argc, char* argv[]) {
 
     std::shared_ptr<Material> material_ground = std::make_shared<Lambertian>(color(0.8, 0.8, 0.0));
     std::shared_ptr<Material> material_center = std::make_shared<Lambertian>(color(0.1, 0.2, 0.5));
-    std::shared_ptr<Material> material_left =   std::make_shared<Metal>(color(0.8, 0.8, 0.8));
-    std::shared_ptr<Material> material_right =  std::make_shared<Metal>(color(0.8, 0.6, 0.2));
+    std::shared_ptr<Material> material_left = std::make_shared<Glass>(1.0 / 1.2);
+    std::shared_ptr<Material> material_right = std::make_shared<Metal>(color(0.8, 0.6, 0.2), 0.f);
 
     HittableList world;
-    world.add(std::make_shared<Sphere>(point3(   0,      0,   -1),   0.5, material_center));
-    world.add(std::make_shared<Sphere>(point3(   0, -100.5,   -1),   100, material_ground));
-    world.add(std::make_shared<Sphere>(point3(-1.0,    0.0, -1.0),   0.5, material_left));
-    world.add(std::make_shared<Sphere>(point3( 1.0,    0.0, -1.0),   0.5, material_right));
+    world.add(std::make_shared<Sphere>(point3(0, -100.5, -1), 100, material_ground));
+    world.add(std::make_shared<Sphere>(point3(0, 0, -1.5), 0.5, material_center));
+    world.add(std::make_shared<Sphere>(point3(-1.0, 0.0, -1.0), 0.5, material_left));
+    world.add(std::make_shared<Sphere>(point3(1.0, 0.0, -1.0), 0.5, material_right));
     Camera cam(world);
 
     // parse args
@@ -63,6 +63,12 @@ int main(const int argc, char* argv[]) {
 
     std::ofstream file(path->c_str(), std::ios::out | std::ios::trunc);
     cam.setOutStream(file);
+
+    // position cam
+    cam.lookfrom = point3(-2, 2, 1);
+    cam.lookat = point3(0, 0, -1);
+    cam.vup = vec3(0, 1, 0);
+
     cam.render();
 
     file.close();
